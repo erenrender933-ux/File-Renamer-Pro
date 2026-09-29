@@ -5,6 +5,10 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from config import Config
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from helpers.metadata import get_media_info, list_streams
 from helpers.progress import progress_for_pyrogram
 
