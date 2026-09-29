@@ -6,19 +6,41 @@ FFPROBE_CMD = (
 )
 
 
-async def get_media_info(file_path):
-    """Returns parsed ffprobe JSON for a media file, or None on failure."""
-    import asyncio
 
-    proc = await asyncio.create_subprocess_shell(
-        FFPROBE_CMD.format(file=file_path),
+async def get_media_info(file_path):
+    """Run ffprobe and return parsed media information."""
+    import asyncio
+    import json
+    import os
+
+    if not file_path or not os.path.exists(file_path):
+        return None
+
+    process = await asyncio.create_subprocess_exec(
+        "ffprobe",
+        "-v", "error",
+        "-print_format", "json",
+        "-show_format",
+        "-show_streams",
+        file_path,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
-    stdout, _ = await proc.communicate()
+
+    stdout, stderr = await process.communicate()
+
+    if process.returncode != 0:
+        print(
+            f"FFPROBE ERROR ({process.returncode}): "
+            f"{stderr.decode(errors='replace')}"
+        )
+        return None
+
     try:
-        return json.loads(stdout.decode())
-    except Exception:
+        return json.loads(stdout.decode("utf-8", errors="replace"))
+    except json.JSONDecodeError as e:
+        print(f"FFPROBE JSON ERROR: {e}")
+        print(stdout.decode(errors="replace")[:2000])
         return None
 
 
