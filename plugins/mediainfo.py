@@ -5,7 +5,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from config import Config
-from helpers.metadata import get_media_info, list_streams
+from ..helpers.metadata import get_media_info, list_streams
 from helpers.progress import progress_for_pyrogram
 
 
